@@ -1,0 +1,65 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.graphics</groupId>
+  <artifactId>primer-parcial</artifactId>
+  <packaging>jar</packaging>
+  <version>1.0-SNAPSHOT</version>
+  <name>primer-parcial</name>
+  <url>http://maven.apache.org</url>
+
+  <!-- JUnit: biblioteca para escribir pruebas unitarias (tests). -->
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <!--
+      LWJGL = Lightweight Java Game Library.
+      Son los "bindings" de Java para OpenGL y GLFW: permiten llamar a OpenGL y GLFW desde Java.
+      Tres módulos principales (sin "natives"):
+        - lwjgl        → Núcleo y carga de bibliotecas nativas.
+        - lwjgl-glfw   → Crear ventanas, teclado, ratón (GLFW desde Java).
+        - lwjgl-opengl → Llamadas a OpenGL (dibujar, shaders, buffers, etc.).
+    -->
+    <dependency>
+      <groupId>org.lwjgl</groupId>
+      <artifactId>lwjgl</artifactId>
+      <version>${lwjgl.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.lwjgl</groupId>
+      <artifactId>lwjgl-glfw</artifactId>
+      <version>${lwjgl.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.lwjgl</groupId>
+      <artifactId>lwjgl-opengl</artifactId>
+      <version>${lwjgl.version}</version>
+    </dependency>
+
+  <!--
+    ==========================================================================
+    BUILD = cómo compilar y qué plugins usar (compilador, ejecutar clase, etc.)
+    ==========================================================================
+  -->
+  <!-- Para que pueda correr el proyecto, para ejecutarlo: mvn clean compile exec:java -->
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>3.6.3</version>
+        <configuration>
+          <mainClass>com.graphics.App</mainClass>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>
