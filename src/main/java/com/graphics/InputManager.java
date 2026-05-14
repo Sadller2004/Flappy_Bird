@@ -3,15 +3,34 @@ package com.graphics;
 import org.lwjgl.glfw.GLFW;
 
 /**
- * Centraliza el teclado.
- * Usa deteccion de flanco para que SPACE/R disparen una sola accion por pulsacion.
+ * Centraliza la lectura del teclado con GLFW.
+ *
+ * Input polling significa preguntar en cada frame "en que estado esta esta tecla?".
+ * En este juego no se usan callbacks de teclado; Game llama a poll(window) una vez
+ * por frame y recibe un InputState simple.
+ *
+ * La clase tambien detecta flancos: una tecla cuenta como presionada solo en el
+ * frame en que pasa de "suelta" a "apretada". Asi SPACE mantenido no genera
+ * muchos saltos o reinicios.
  */
 public class InputManager {
 
     private boolean previousSpace;
     private boolean previousR;
 
+    /**
+     * Lee el teclado de la ventana actual.
+     *
+     * Recibe: window, el identificador de la ventana GLFW.
+     * Modifica: previousSpace/previousR para recordar el estado del frame anterior.
+     * Devuelve: InputState con acciones de SPACE y R detectadas por flanco.
+     * Momento: Game.processInput() lo llama una vez por frame.
+     */
     public InputState poll(long window) {
+        /*
+         * ESC no se devuelve como accion: directamente marca la ventana para cerrar.
+         * El game loop terminara cuando glfwWindowShouldClose(window) sea true.
+         */
         if (GLFW.glfwGetKey(window, GLFW.GLFW_KEY_ESCAPE) == GLFW.GLFW_PRESS) {
             GLFW.glfwSetWindowShouldClose(window, true);
         }
@@ -29,6 +48,8 @@ public class InputManager {
 
     /**
      * Estado simple de entradas relevantes para el juego.
+     *
+     * No contiene la tecla ESC porque esa tecla ya se aplica directamente sobre la ventana.
      */
     public static class InputState {
         private final boolean spacePressed;

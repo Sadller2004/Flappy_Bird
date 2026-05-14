@@ -2,7 +2,14 @@ package com.graphics;
 
 /**
  * Modelo de una tuberia.
- * Una misma instancia representa la parte superior e inferior separadas por un gap.
+ *
+ * Una instancia de Pipe representa el obstaculo completo:
+ * - un rectangulo superior,
+ * - un rectangulo inferior,
+ * - y el espacio libre o gap entre ambos.
+ *
+ * La clase no dibuja directamente. Solo calcula posiciones y limites para que
+ * PipeManager pueda detectar colisiones y Renderer pueda dibujar las partes.
  */
 public class Pipe {
 
@@ -16,10 +23,21 @@ public class Pipe {
     private final float gapCenterY;
     private boolean scored;
 
+    /**
+     * Crea una tuberia con ancho, gap y velocidad por defecto.
+     *
+     * Recibe: x inicial y centro vertical del gap.
+     * Modifica: inicializa el estado interno de la tuberia.
+     * Devuelve: una nueva instancia de Pipe.
+     * Momento: PipeManager.spawnPipe() lo usa al crear obstaculos.
+     */
     public Pipe(float x, float gapCenterY) {
         this(x, gapCenterY, DEFAULT_WIDTH, DEFAULT_GAP_HEIGHT);
     }
 
+    /**
+     * Constructor mas configurable para mantener la clase flexible.
+     */
     public Pipe(float x, float gapCenterY, float width, float gapHeight) {
         this.x = x;
         this.gapCenterY = gapCenterY;
@@ -29,6 +47,11 @@ public class Pipe {
 
     /**
      * Mueve la tuberia de derecha a izquierda.
+     *
+     * Recibe: dt, tiempo en segundos desde el frame anterior.
+     * Modifica: x.
+     * Devuelve: nada.
+     * Momento: PipeManager.update() lo llama una vez por frame por cada tuberia.
      */
     public void update(float dt) {
         x -= DEFAULT_SPEED * dt;
@@ -36,15 +59,26 @@ public class Pipe {
 
     /**
      * Indica si el pajaro ya supero esta tuberia y todavia no sumo punto.
+     *
+     * Recibe: birdX, posicion horizontal del pajaro.
+     * Modifica: nada.
+     * Devuelve: true si el borde derecho de la tuberia quedo detras del pajaro.
+     * Momento: PipeManager.update() lo revisa despues de mover la tuberia.
      */
     public boolean canScore(float birdX) {
         return !scored && getRight() < birdX;
     }
 
+    /**
+     * Marca la tuberia como ya puntuada para no sumar varias veces.
+     */
     public void markScored() {
         scored = true;
     }
 
+    /**
+     * Devuelve true cuando la tuberia ya salio por la izquierda de la pantalla.
+     */
     public boolean isOffScreen() {
         return getRight() < -1.3f;
     }
@@ -81,6 +115,11 @@ public class Pipe {
         return gapCenterY - (gapHeight * 0.5f);
     }
 
+    /*
+     * Los siguientes metodos convierten el gap en dos rectangulos renderizables.
+     * OpenGL dibuja rectangulos por centro y escala, por eso calculamos altura
+     * y centro de cada tramo.
+     */
     public float getUpperHeight() {
         return 1.0f - getGapTop();
     }
