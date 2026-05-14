@@ -1,1 +1,9 @@
-com\graphics\App.class
+com\graphics\Game.class
+com\graphics\Pipe.class
+com\graphics\InputManager.class
+com\graphics\PipeManager$UpdateResult.class
+com\graphics\Renderer.class
+com\graphics\PipeManager.class
+com\graphics\InputManager$InputState.class
+com\graphics\Bird.class
+com\graphics\AppFlappyBird.class
