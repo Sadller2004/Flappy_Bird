@@ -5,8 +5,10 @@ import org.lwjgl.glfw.GLFW;
 /**
  * Centraliza la lectura del teclado con GLFW.
  *
- * Input polling significa preguntar en cada frame "en que estado esta esta tecla?".
- * En este juego no se usan callbacks de teclado; Game llama a poll(window) una vez
+ * Input polling significa preguntar en cada frame "en que estado esta esta
+ * tecla?".
+ * En este juego no se usan callbacks de teclado; Game llama a poll(window) una
+ * vez
  * por frame y recibe un InputState simple.
  *
  * La clase tambien detecta flancos: una tecla cuenta como presionada solo en el
@@ -17,6 +19,10 @@ public class InputManager {
 
     private boolean previousSpace;
     private boolean previousR;
+
+    // R2.
+    private boolean previousW;
+    private boolean previousUp;
 
     /**
      * Lee el teclado de la ventana actual.
@@ -43,29 +49,50 @@ public class InputManager {
         boolean rPressed = rNow && !previousR;
         previousR = rNow;
 
-        return new InputState(spacePressed, rPressed);
+        // -------------------------- R2. ---------------------------------------------
+        boolean wNow = GLFW.glfwGetKey(window, GLFW.GLFW_KEY_W) == GLFW.GLFW_PRESS;
+        boolean wPressed = wNow && !previousW;
+        previousW = wNow;
+
+        boolean upNow = GLFW.glfwGetKey(window, GLFW.GLFW_KEY_UP) == GLFW.GLFW_PRESS;
+        boolean upPressed = upNow && !previousUp;
+        previousUp = upNow;
+
+        boolean player2JumpPressed = wPressed || upPressed;
+
+        return new InputState(spacePressed, player2JumpPressed, rPressed);
+        //--------------------------------------------------------------------------------
     }
 
     /**
+     * -------------------------- R2.--------------------------
      * Estado simple de entradas relevantes para el juego.
      *
-     * No contiene la tecla ESC porque esa tecla ya se aplica directamente sobre la ventana.
+     * No contiene la tecla ESC porque esa tecla ya se aplica directamente sobre la
+     * ventana.
      */
     public static class InputState {
-        private final boolean spacePressed;
+        private final boolean player1JumpPressed;
+        private final boolean player2JumpPressed;
         private final boolean rPressed;
 
-        public InputState(boolean spacePressed, boolean rPressed) {
-            this.spacePressed = spacePressed;
+        public InputState(boolean player1JumpPressed, boolean player2JumpPressed, boolean rPressed) {
+            this.player1JumpPressed = player1JumpPressed;
+            this.player2JumpPressed = player2JumpPressed;
             this.rPressed = rPressed;
         }
 
-        public boolean isSpacePressed() {
-            return spacePressed;
+        public boolean isPlayer1JumpPressed() {
+            return player1JumpPressed;
+        }
+
+        public boolean isPlayer2JumpPressed() {
+            return player2JumpPressed;
         }
 
         public boolean isRPressed() {
             return rPressed;
         }
     }
+    //------------------------------------------------------------------------------
 }

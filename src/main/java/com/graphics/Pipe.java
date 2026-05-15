@@ -21,7 +21,11 @@ public class Pipe {
     private final float gapHeight;
     private float x;
     private final float gapCenterY;
-    private boolean scored;
+
+    // ----------------------------- R2. --------------------------------
+    private boolean scoredPlayer1;
+    private boolean scoredPlayer2;
+    // -------------------------------------------------------------
 
     /**
      * Crea una tuberia con ancho, gap y velocidad por defecto.
@@ -58,23 +62,34 @@ public class Pipe {
     }
 
     /**
+     * -------------------------------------R2.----------------------------------------
      * Indica si el pajaro ya supero esta tuberia y todavia no sumo punto.
-     *
+     * Con la logica de 2 jugadores haora cada uno tiene sus metodos
      * Recibe: birdX, posicion horizontal del pajaro.
      * Modifica: nada.
      * Devuelve: true si el borde derecho de la tuberia quedo detras del pajaro.
      * Momento: PipeManager.update() lo revisa despues de mover la tuberia.
      */
-    public boolean canScore(float birdX) {
-        return !scored && getRight() < birdX;
+    public boolean canScorePlayer1(float birdX) {
+        return !scoredPlayer1 && getRight() < birdX;
+    }
+
+    public boolean canScorePlayer2(float birdX) {
+        return !scoredPlayer2 && getRight() < birdX;
     }
 
     /**
+     * 
      * Marca la tuberia como ya puntuada para no sumar varias veces.
      */
-    public void markScored() {
-        scored = true;
+    public void markScoredPlayer1() {
+        scoredPlayer1 = true;
     }
+
+    public void markScoredPlayer2() {
+        scoredPlayer2 = true;
+    }
+    // ----------------------------------------------------------------------------
 
     /**
      * Devuelve true cuando la tuberia ya salio por la izquierda de la pantalla.

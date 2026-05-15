@@ -9,7 +9,8 @@ package com.graphics;
  * - width/height se usan para renderizar y para colisiones.
  *
  * Tener esta clase separada facilita agregar despues un segundo jugador:
- * se podria crear otro Bird con otra posicion o controles sin mezclarlo con OpenGL.
+ * se podria crear otro Bird con otra posicion o controles sin mezclarlo con
+ * OpenGL.
  */
 public class Bird {
 
@@ -29,16 +30,30 @@ public class Bird {
     private float y;
     private float velocityY;
 
+    // R2.
+    private final float startY;
+
     /**
-     * Crea el pajaro en su posicion horizontal fija y lo reinicia.
+     * R2.
+     * Crea el pajaro en su posicion horizontal por defecto.
      */
     public Bird() {
-        this.x = DEFAULT_X;
+        this(DEFAULT_X, 0.0f);
+    }
+
+    /**
+     * R2.
+     * Crea el pajaro con posicion a asignar en el espacio
+     */
+    public Bird(float x, float startY) {
+        this.x = x;
+        this.startY = startY;
         reset();
     }
 
     /**
-     * Reinicia al pajaro al centro de la pantalla, sin velocidad.
+     * R2.
+     * Reinicia al pajaro con la posicion que se le asigno, sin velocidad.
      *
      * Recibe: nada.
      * Modifica: y y velocityY.
@@ -46,7 +61,7 @@ public class Bird {
      * Momento: al iniciar una partida o al reiniciar despues de game over.
      */
     public void reset() {
-        y = 0.0f;
+        y = startY;
         velocityY = 0.0f;
     }
 
@@ -93,6 +108,19 @@ public class Bird {
         return getTop() >= 1.0f || getBottom() <= -1.0f;
     }
 
+    /**
+     * R2.
+     * Dinamica de muerte del Bird
+     * @param dt
+     */
+    public void dead(float dt) {
+        velocityY -= GRAVITY * dt;
+        if (velocityY < MAX_FALL_SPEED) {
+            velocityY = MAX_FALL_SPEED;
+        }
+        y -= velocityY * dt;
+    }
+
     public float getX() {
         return x;
     }
@@ -129,4 +157,9 @@ public class Bird {
     public float getTop() {
         return y + (HEIGHT * 0.5f);
     }
+
+    public void setVelocityY(float velocityY) {
+        this.velocityY = velocityY;
+    }
+
 }

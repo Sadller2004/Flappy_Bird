@@ -53,6 +53,7 @@ public class Renderer {
     }
 
     /**
+     * R2.
      * Renderiza un frame completo del juego.
      *
      * Recibe: bird, lista de pipes y bandera gameOver.
@@ -60,7 +61,8 @@ public class Renderer {
      * Devuelve: nada.
      * Momento: Game.render() lo llama una vez por frame.
      */
-    public void render(Bird bird, List<Pipe> pipes, boolean gameOver) {
+    public void render(Bird player1, Bird player2, List<Pipe> pipes, boolean player1Alive, boolean player2Alive,
+            boolean gameOver) {
         renderBackground();
 
         /*
@@ -71,7 +73,18 @@ public class Renderer {
         GL30.glBindVertexArray(vao);
 
         renderPipes(pipes);
-        renderBird(bird);
+
+        if (player1Alive) {
+            renderBirdPlayer1(player1);
+        } else {
+            renderDeadBird(player1);
+        }
+
+        if (player2Alive) {
+            renderBirdPlayer2(player2);
+        } else {
+            renderDeadBird(player2);
+        }
 
         if (gameOver) {
             renderGameOverOverlay();
@@ -85,6 +98,32 @@ public class Renderer {
     }
 
     /**
+     * Dibuja el pajaro usando su posicion y tamano actuales.
+     */
+    public void renderBirdPlayer1(Bird bird) {
+        drawRect(bird.getX(), bird.getY(), bird.getWidth(), bird.getHeight(),
+                0.898f, 0.169f, 0.314f); // rojo amaranto
+    }
+
+    /**
+     * Dibuja el pajaro usando su posicion y tamano actuales.
+     */
+    public void renderBirdPlayer2(Bird bird) {
+        drawRect(bird.getX(), bird.getY(), bird.getWidth(), bird.getHeight(),
+                0.20f, 0.45f, 1.00f); // azul
+    }
+
+    /**
+     * Dibuja el pajaro usando su posicion y tamano actuales de la colision y cambiandole de color.
+     */
+    public void renderDeadBird(Bird bird) {
+        drawRect(bird.getX(), bird.getY(), bird.getWidth(), bird.getHeight(),
+                0.35f, 0.35f, 0.35f); // gris
+    }
+
+    // --------------------------------------------------//--------------------------------------------------
+
+    /**
      * Crea shaders 2D.
      *
      * Recibe: nada.
@@ -93,29 +132,30 @@ public class Renderer {
      * Momento: durante Renderer.init().
      *
      * Shader:
-     * - Vertex shader: transforma cada vertice del quad base usando escala y offset.
+     * - Vertex shader: transforma cada vertice del quad base usando escala y
+     * offset.
      * - Fragment shader: decide el color final de cada pixel dibujado.
      */
     private void createShaders() {
         String vertexSrc = """
-            #version 330 core
-            layout (location = 0) in vec3 aPos;
-            uniform vec2 uOffset;
-            uniform vec2 uScale;
-            void main() {
-                vec2 finalPos = aPos.xy * uScale + uOffset;
-                gl_Position = vec4(finalPos, aPos.z, 1.0);
-            }
-            """;
+                #version 330 core
+                layout (location = 0) in vec3 aPos;
+                uniform vec2 uOffset;
+                uniform vec2 uScale;
+                void main() {
+                    vec2 finalPos = aPos.xy * uScale + uOffset;
+                    gl_Position = vec4(finalPos, aPos.z, 1.0);
+                }
+                """;
 
         String fragmentSrc = """
-            #version 330 core
-            uniform vec3 uColor;
-            out vec4 fragColor;
-            void main() {
-                fragColor = vec4(uColor, 1.0);
-            }
-            """;
+                #version 330 core
+                uniform vec3 uColor;
+                out vec4 fragColor;
+                void main() {
+                    fragColor = vec4(uColor, 1.0);
+                }
+                """;
 
         int vertexShader = GL20.glCreateShader(GL20.GL_VERTEX_SHADER);
         GL20.glShaderSource(vertexShader, vertexSrc);
@@ -173,12 +213,12 @@ public class Renderer {
      */
     private void createBaseQuad() {
         float[] vertices = {
-            -0.5f, -0.5f, 0.0f,
-             0.5f, -0.5f, 0.0f,
-             0.5f,  0.5f, 0.0f,
-            -0.5f, -0.5f, 0.0f,
-             0.5f,  0.5f, 0.0f,
-            -0.5f,  0.5f, 0.0f
+                -0.5f, -0.5f, 0.0f,
+                0.5f, -0.5f, 0.0f,
+                0.5f, 0.5f, 0.0f,
+                -0.5f, -0.5f, 0.0f,
+                0.5f, 0.5f, 0.0f,
+                -0.5f, 0.5f, 0.0f
         };
 
         vao = GL30.glGenVertexArrays();
@@ -215,13 +255,6 @@ public class Renderer {
     }
 
     /**
-     * Dibuja el pajaro usando su posicion y tamano actuales.
-     */
-    public void renderBird(Bird bird) {
-        drawRect(bird.getX(), bird.getY(), bird.getWidth(), bird.getHeight(), 0.98f, 0.85f, 0.20f);
-    }
-
-    /**
      * Dibuja las tuberias como dos rectangulos por cada Pipe.
      */
     public void renderPipes(List<Pipe> pipes) {
@@ -239,7 +272,8 @@ public class Renderer {
     }
 
     /**
-     * Dibuja una franja oscura al centro para indicar game over sin usar texto OpenGL.
+     * Dibuja una franja oscura al centro para indicar game over sin usar texto
+     * OpenGL.
      */
     public void renderGameOverOverlay() {
         drawRect(0.0f, 0.0f, 2.0f, 0.22f, 0.15f, 0.18f, 0.22f);

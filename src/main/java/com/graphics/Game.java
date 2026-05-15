@@ -13,8 +13,10 @@ import org.lwjgl.opengl.GL;
  * - Guardar el estado general de la partida: started, gameOver y score.
  * - Liberar recursos al cerrar.
  *
- * Game no dibuja directamente y tampoco calcula los detalles internos del pajaro
- * o las tuberias. Para eso delega en Bird, PipeManager, InputManager y Renderer.
+ * Game no dibuja directamente y tampoco calcula los detalles internos del
+ * pajaro
+ * o las tuberias. Para eso delega en Bird, PipeManager, InputManager y
+ * Renderer.
  */
 public class Game {
 
@@ -41,12 +43,19 @@ public class Game {
      * - Renderer dibuja el estado actual usando OpenGL.
      * - InputManager convierte teclas en acciones simples.
      */
-    private final Bird bird = new Bird();
+    // ------------------------------- R2. -------------------------------
+    private final Bird player1 = new Bird(-0.45f, 0.00f);
+    private final Bird player2 = new Bird(-0.65f, 0.00f);
+    private int scorePlayer1;
+    private int scorePlayer2;
+    private boolean player1Alive;
+    private boolean player2Alive;
+    // -------------------------------//-------------------------------
+
     private final PipeManager pipeManager = new PipeManager();
     private final Renderer renderer = new Renderer();
     private final InputManager inputManager = new InputManager();
 
-    private int score;
     private boolean started;
     private boolean gameOver;
 
@@ -54,7 +63,8 @@ public class Game {
      * Metodo principal de ejecucion del juego.
      *
      * Recibe: nada.
-     * Modifica: crea ventana, inicializa objetos, ejecuta el loop y libera recursos.
+     * Modifica: crea ventana, inicializa objetos, ejecuta el loop y libera
+     * recursos.
      * Devuelve: nada.
      * Momento: se llama desde AppFlappyBird.main().
      */
@@ -104,7 +114,8 @@ public class Game {
 
         /*
          * El OpenGL context es el estado que conecta las llamadas OpenGL con
-         * esta ventana y con la GPU. Debe ser actual antes de usar GL.createCapabilities().
+         * esta ventana y con la GPU. Debe ser actual antes de usar
+         * GL.createCapabilities().
          */
         GLFW.glfwMakeContextCurrent(window);
         GLFW.glfwSwapInterval(1); // VSync: sincroniza el swap con el refresco del monitor.
@@ -119,6 +130,7 @@ public class Game {
     }
 
     /**
+     * -------------------------------R2.------------------------------------
      * Reinicia el estado completo de una partida.
      *
      * Recibe: nada.
@@ -127,11 +139,20 @@ public class Game {
      * Momento: al iniciar el juego y al reiniciar despues de game over.
      */
     private void resetGame() {
-        bird.reset();
+        player1.reset();
+        player2.reset();
+
         pipeManager.reset();
-        score = 0;
+
+        scorePlayer1 = 0;
+        scorePlayer2 = 0;
+
+        player1Alive = true;
+        player2Alive = true;
+
         started = false;
         gameOver = false;
+
         updateWindowTitle();
     }
 
@@ -179,22 +200,36 @@ public class Game {
     }
 
     /**
+     * ---------------------------R2.--------------------------------
      * Interpreta las acciones de teclado segun el estado del juego.
      *
      * Recibe: nada directamente; InputManager lee el estado de la ventana.
-     * Modifica: started, gameOver mediante resetGame(), y velocidad del pajaro con jump().
+     * Modifica: started, gameOver mediante resetGame(), y velocidad del pajaro con
+     * jump().
      * Devuelve: nada.
      * Momento: una vez por frame, antes de update(dt).
      */
     private void processInput() {
         InputManager.InputState input = inputManager.poll(window);
 
-        if (input.isSpacePressed()) {
-            if (gameOver) {
-                resetGame();
-            }
+        if (gameOver && (input.isPlayer1JumpPressed() || input.isPlayer2JumpPressed())) {
+            resetGame();
+            return;
+        }
+
+        if (input.isPlayer1JumpPressed()) {
             started = true;
-            bird.jump();
+            if (player1Alive) {// Validacion si un player esta kill no salte
+                player1.jump();
+            }
+            updateWindowTitle();
+        }
+
+        if (input.isPlayer2JumpPressed()) {
+            started = true;
+            if (player2Alive) {// Validacion si un player esta kill no salte
+                player2.jump();
+            }
             updateWindowTitle();
         }
 
@@ -204,6 +239,7 @@ public class Game {
     }
 
     /**
+     * R2.
      * Actualiza fisica, tuberias, puntaje y condiciones de game over.
      *
      * Recibe: dt, el tiempo en segundos desde el frame anterior.
@@ -216,30 +252,44 @@ public class Game {
             return;
         }
 
-        bird.update(dt);
-        if (bird.isOutOfBounds()) {
+        if (!player1Alive && !player2Alive) {
             gameOver = true;
-            updateWindowTitle();
-            return;
         }
 
-        /*
-         * PipeManager devuelve un resultado pequeno para que Game siga siendo
-         * quien decide sobre el puntaje global y el estado gameOver.
-         */
-        PipeManager.UpdateResult result = pipeManager.update(dt, bird);
-        if (result.getScoreDelta() > 0) {
-            score += result.getScoreDelta();
-            updateWindowTitle();
+        pipeManager.updatePipes(dt);
+
+        if (player1Alive) {
+            player1.update(dt);
+
+            if (player1.isOutOfBounds() || pipeManager.collidesWithBird(player1)) {
+                player1.setVelocityY(-0.3f);
+                player1Alive = false;
+            } else {
+                scorePlayer1 += pipeManager.consumeScoreForPlayer1(player1);
+            }
+        } else {
+            player1.dead(dt);
         }
 
-        if (result.hasCollision()) {
-            gameOver = true;
-            updateWindowTitle();
+        if (player2Alive) {
+            player2.update(dt);
+
+            if (player2.isOutOfBounds() || pipeManager.collidesWithBird(player2)) {
+                player2.setVelocityY(-0.3f);
+                player2Alive = false;
+            } else {
+                scorePlayer2 += pipeManager.consumeScoreForPlayer2(player2);
+            }
+        } else {
+            player2.dead(dt);
         }
+
+        updateWindowTitle();
     }
+    // ---------------------------------------------//---------------------------------------------
 
     /**
+     * R2.
      * Renderiza el estado actual.
      *
      * Recibe: nada directamente; usa bird, pipeManager y gameOver.
@@ -248,10 +298,12 @@ public class Game {
      * Momento: una vez por frame, despues de update(dt).
      */
     private void render() {
-        renderer.render(bird, pipeManager.getPipes(), gameOver);
+        renderer.render(player1, player2, pipeManager.getPipes(), player1Alive, player2Alive, gameOver);
     }
+    // ----------------------------------------------//----------------------------------------------
 
     /**
+     * R2.
      * Actualiza el texto de la barra de titulo como feedback simple.
      *
      * Recibe: nada.
@@ -264,15 +316,19 @@ public class Game {
             return;
         }
 
-        String baseTitle = "Flappy Bird OpenGL | Puntos: " + score;
+        String baseTitle = "Flappy Bird OpenGL"
+                + " | azul: " + scorePlayer2 + (player2Alive ? " vivo" : " muerto")
+                + " | rojo: " + scorePlayer1 + (player1Alive ? " vivo" : " muerto");
+
         if (!started) {
-            GLFW.glfwSetWindowTitle(window, baseTitle + " | SPACE para empezar");
+            GLFW.glfwSetWindowTitle(window, baseTitle + " | SPACE J1 / W o UP J2 para empezar");
         } else if (gameOver) {
-            GLFW.glfwSetWindowTitle(window, baseTitle + " | GAME OVER - SPACE o R para reiniciar");
+            GLFW.glfwSetWindowTitle(window, baseTitle + " | GAME OVER - R para reiniciar");
         } else {
             GLFW.glfwSetWindowTitle(window, baseTitle);
         }
     }
+    // --------------------------------------------------------//--------------------------------------------------------
 
     /**
      * Limpia OpenGL y GLFW en orden inverso a la inicializacion.

@@ -15,7 +15,8 @@ import java.util.Random;
  * - detectar si el pajaro paso una tuberia,
  * - detectar colisiones AABB.
  *
- * Game no necesita conocer el detalle de cada tuberia; solo recibe un UpdateResult
+ * Game no necesita conocer el detalle de cada tuberia; solo recibe un
+ * UpdateResult
  * indicando cuantos puntos se ganaron y si ocurrio una colision.
  */
 public class PipeManager {
@@ -30,30 +31,6 @@ public class PipeManager {
     private float spawnTimer;
 
     /**
-     * Resultado de actualizar tuberias en un frame.
-     *
-     * scoreDelta indica cuantos puntos se suman en este frame.
-     * collision indica si alguna tuberia choco con el pajaro.
-     */
-    public static class UpdateResult {
-        private final int scoreDelta;
-        private final boolean collision;
-
-        public UpdateResult(int scoreDelta, boolean collision) {
-            this.scoreDelta = scoreDelta;
-            this.collision = collision;
-        }
-
-        public int getScoreDelta() {
-            return scoreDelta;
-        }
-
-        public boolean hasCollision() {
-            return collision;
-        }
-    }
-
-    /**
      * Limpia todas las tuberias y reinicia el temporizador de spawn.
      *
      * Recibe: nada.
@@ -64,49 +41,6 @@ public class PipeManager {
     public void reset() {
         pipes.clear();
         spawnTimer = 0.0f;
-    }
-
-    /**
-     * Actualiza obstaculos y devuelve si hubo puntos o colision.
-     *
-     * Recibe: dt y bird. dt controla el avance temporal; bird aporta limites para puntaje/choque.
-     * Modifica: lista de tuberias, posiciones, estado scored y temporizador de spawn.
-     * Devuelve: UpdateResult con puntos ganados y bandera de colision.
-     * Momento: Game.update(dt) lo llama una vez por frame cuando el juego esta activo.
-     */
-    public UpdateResult update(float dt, Bird bird) {
-        int scoreDelta = 0;
-
-        spawnTimer += dt;
-        if (spawnTimer >= SPAWN_INTERVAL) {
-            spawnTimer = 0.0f;
-            spawnPipe();
-        }
-
-        /*
-         * Iterator permite eliminar tuberias de la lista mientras se recorre,
-         * sin provocar errores por modificar la coleccion en medio del loop.
-         */
-        Iterator<Pipe> iterator = pipes.iterator();
-        while (iterator.hasNext()) {
-            Pipe pipe = iterator.next();
-            pipe.update(dt);
-
-            if (pipe.canScore(bird.getX())) {
-                pipe.markScored();
-                scoreDelta++;
-            }
-
-            if (collidesWithBird(pipe, bird)) {
-                return new UpdateResult(scoreDelta, true);
-            }
-
-            if (pipe.isOffScreen()) {
-                iterator.remove();
-            }
-        }
-
-        return new UpdateResult(scoreDelta, false);
     }
 
     /**
@@ -136,7 +70,7 @@ public class PipeManager {
      * 1. Primero se revisa si los rectangulos se cruzan horizontalmente.
      * 2. Si no hay cruce en X, no puede haber choque.
      * 3. Si hay cruce en X, el pajaro colisiona cuando esta por encima del gap
-     *    o por debajo del gap.
+     * o por debajo del gap.
      */
     private boolean collidesWithBird(Pipe pipe, Bird bird) {
         boolean overlapX = bird.getRight() > pipe.getLeft() && bird.getLeft() < pipe.getRight();
@@ -146,4 +80,64 @@ public class PipeManager {
 
         return bird.getTop() > pipe.getGapTop() || bird.getBottom() < pipe.getGapBottom();
     }
+
+    /**
+     * R2.
+     */
+    // Actualizar solo las tuberías
+    public void updatePipes(float dt) {
+        spawnTimer += dt;
+        if (spawnTimer >= SPAWN_INTERVAL) {
+            spawnTimer = 0.0f;
+            spawnPipe();
+        }
+
+        Iterator<Pipe> iterator = pipes.iterator();
+        while (iterator.hasNext()) {
+            Pipe pipe = iterator.next();
+            pipe.update(dt);
+
+            if (pipe.isOffScreen()) {
+                iterator.remove();
+            }
+        }
+    }
+
+    // Detectar colisión para cualquier pájaro
+    public boolean collidesWithBird(Bird bird) {
+        for (Pipe pipe : pipes) {
+            if (collidesWithBird(pipe, bird)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // Calcular puntaje por jugador
+    public int consumeScoreForPlayer1(Bird bird) {
+        int scoreDelta = 0;
+
+        for (Pipe pipe : pipes) {
+            if (pipe.canScorePlayer1(bird.getX())) {
+                pipe.markScoredPlayer1();
+                scoreDelta++;
+            }
+        }
+
+        return scoreDelta;
+    }
+
+    public int consumeScoreForPlayer2(Bird bird) {
+        int scoreDelta = 0;
+
+        for (Pipe pipe : pipes) {
+            if (pipe.canScorePlayer2(bird.getX())) {
+                pipe.markScoredPlayer2();
+                scoreDelta++;
+            }
+        }
+
+        return scoreDelta;
+    }
+    // --------------------------------------------------------------------------------------------
 }
