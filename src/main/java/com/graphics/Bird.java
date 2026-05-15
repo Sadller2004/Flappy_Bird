@@ -6,7 +6,7 @@ package com.graphics;
  * El pajaro se modela como un rectangulo en coordenadas NDC:
  * - x es fija para que el jugador no avance realmente por la pantalla.
  * - y cambia por gravedad y salto.
- * - width/height se usan para renderizar y para colisiones.
+ * - width/height se mantienen como caja de colision AABB.
  *
  * Tener esta clase separada facilita agregar despues un segundo jugador:
  * se podria crear otro Bird con otra posicion o controles sin mezclarlo con
@@ -156,6 +156,22 @@ public class Bird {
 
     public float getTop() {
         return y + (HEIGHT * 0.5f);
+    }
+
+    /**
+     * Devuelve la velocidad vertical actual.
+     *
+     * Recibe: nada.
+     * Modifica: nada.
+     * Devuelve: velocityY.
+     * Momento: Renderer lo consulta para inclinar el pajaro y animar el ala.
+     *
+     * Este getter no cambia la fisica ni la colision. Solo expone un dato que ya
+     * existe para que el dibujo geometrico sea coherente cuando el pajaro sube o
+     * baja.
+     */
+    public float getVelocityY() {
+        return velocityY;
     }
 
     public void setVelocityY(float velocityY) {

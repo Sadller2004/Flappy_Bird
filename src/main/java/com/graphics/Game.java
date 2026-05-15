@@ -47,7 +47,7 @@ public class Game {
      */
     // ------------------------------- R2. -------------------------------
     private final Bird player1 = new Bird(-0.45f, 0.00f);
-    private final Bird player2 = new Bird(-0.65f, 0.00f);
+    private final Bird player2 = new Bird(-0.70f, 0.00f);
     private int scorePlayer1;
     private int scorePlayer2;
     private boolean player1Alive;
