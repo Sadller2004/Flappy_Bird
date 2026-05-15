@@ -310,7 +310,19 @@ public class Game {
      * Momento: una vez por frame, despues de update(dt).
      */
     private void render() {
-        renderer.render(player1, player2, pipeManager.getPipes(), player1Alive, player2Alive, gameOver);
+        renderer.render(
+                player1,
+                player2,
+                pipeManager.getPipes(),
+                player1Alive,
+                player2Alive,
+                started,
+                gameOver,
+                scorePlayer1,
+                scorePlayer2,
+                pipeManager.getCurrentLevel(),
+                pipeManager.getCurrentPipeSpeed(),
+                pipeManager.getCurrentSpawnInterval());
     }
     // ----------------------------------------------//----------------------------------------------
 

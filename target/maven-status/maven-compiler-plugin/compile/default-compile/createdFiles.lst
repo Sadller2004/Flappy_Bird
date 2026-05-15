@@ -1,8 +1,13 @@
 com\graphics\Game.class
 com\graphics\Pipe.class
 com\graphics\InputManager.class
+com\graphics\renderers\HudRenderer.class
 com\graphics\Renderer.class
+com\graphics\renderers\ShapeRenderer.class
 com\graphics\PipeManager.class
+com\graphics\renderers\BackgroundRenderer.class
+com\graphics\renderers\PipeRenderer.class
 com\graphics\InputManager$InputState.class
 com\graphics\Bird.class
+com\graphics\renderers\BirdRenderer.class
 com\graphics\AppFlappyBird.class

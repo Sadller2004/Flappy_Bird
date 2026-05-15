@@ -5,3 +5,8 @@ D:\Materias\Grafica\primer-parcial\src\main\java\com\graphics\InputManager.java
 D:\Materias\Grafica\primer-parcial\src\main\java\com\graphics\Pipe.java
 D:\Materias\Grafica\primer-parcial\src\main\java\com\graphics\PipeManager.java
 D:\Materias\Grafica\primer-parcial\src\main\java\com\graphics\Renderer.java
+D:\Materias\Grafica\primer-parcial\src\main\java\com\graphics\renderers\BackgroundRenderer.java
+D:\Materias\Grafica\primer-parcial\src\main\java\com\graphics\renderers\BirdRenderer.java
+D:\Materias\Grafica\primer-parcial\src\main\java\com\graphics\renderers\HudRenderer.java
+D:\Materias\Grafica\primer-parcial\src\main\java\com\graphics\renderers\PipeRenderer.java
+D:\Materias\Grafica\primer-parcial\src\main\java\com\graphics\renderers\ShapeRenderer.java
