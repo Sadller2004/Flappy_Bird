@@ -15,7 +15,6 @@ public class Pipe {
 
     public static final float DEFAULT_WIDTH = 0.18f;
     public static final float DEFAULT_GAP_HEIGHT = 0.48f;
-    public static final float DEFAULT_SPEED = 0.62f;
 
     private final float width;
     private final float gapHeight;
@@ -28,7 +27,7 @@ public class Pipe {
     // -------------------------------------------------------------
 
     /**
-     * Crea una tuberia con ancho, gap y velocidad por defecto.
+     * Crea una tuberia con ancho y gap por defecto.
      *
      * Recibe: x inicial y centro vertical del gap.
      * Modifica: inicializa el estado interno de la tuberia.
@@ -50,15 +49,21 @@ public class Pipe {
     }
 
     /**
-     * Mueve la tuberia de derecha a izquierda.
+     * R3.
+     * Mueve la tuberia de derecha a izquierda usando una velocidad dinamica.
      *
      * Recibe: dt, tiempo en segundos desde el frame anterior.
+     * Recibe: speed, velocidad actual calculada por PipeManager.
      * Modifica: x.
      * Devuelve: nada.
      * Momento: PipeManager.update() lo llama una vez por frame por cada tuberia.
+     *
+     * La velocidad no se define aqui porque la dificultad cambia durante la
+     * partida. PipeManager decide la velocidad segun el nivel actual y Pipe solo
+     * aplica ese movimiento a su posicion.
      */
-    public void update(float dt) {
-        x -= DEFAULT_SPEED * dt;
+    public void update(float dt, float speed) {
+        x -= speed * dt;
     }
 
     /**

@@ -1,5 +1,7 @@
 package com.graphics;
 
+import java.util.Locale;
+
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL;
 
@@ -130,7 +132,7 @@ public class Game {
     }
 
     /**
-     * -------------------------------R2.------------------------------------
+     * -------------------------------R2.R3.------------------------------------
      * Reinicia el estado completo de una partida.
      *
      * Recibe: nada.
@@ -142,10 +144,11 @@ public class Game {
         player1.reset();
         player2.reset();
 
-        pipeManager.reset();
-
         scorePlayer1 = 0;
         scorePlayer2 = 0;
+
+        pipeManager.reset();
+        pipeManager.updateDifficulty(scorePlayer1, scorePlayer2); //R3. despues del puntaje para obtener cambios
 
         player1Alive = true;
         player2Alive = true;
@@ -239,11 +242,12 @@ public class Game {
     }
 
     /**
-     * R2.
-     * Actualiza fisica, tuberias, puntaje y condiciones de game over.
+     * R2.R3.
+     * Actualiza fisica, tuberias, puntaje, dificultad y condiciones de game over.
      *
      * Recibe: dt, el tiempo en segundos desde el frame anterior.
-     * Modifica: posicion/velocidad del pajaro, tuberias activas, score y gameOver.
+     * Modifica: posicion/velocidad del pajaro, tuberias activas, score,
+     * dificultad y gameOver.
      * Devuelve: nada.
      * Momento: una vez por frame, despues del input y antes del render.
      */
@@ -284,6 +288,14 @@ public class Game {
             player2.dead(dt);
         }
 
+        /*
+         * R2.3.
+         * La dificultad se actualiza despues de sumar los puntos de ambos jugadores.
+         * Asi el nivel nuevo aparece inmediatamente en el titulo y se usa desde el
+         * siguiente frame para mover y generar tuberias.
+         */
+        pipeManager.updateDifficulty(scorePlayer1, scorePlayer2);
+
         updateWindowTitle();
     }
     // ---------------------------------------------//---------------------------------------------
@@ -309,16 +321,28 @@ public class Game {
      * Recibe: nada.
      * Modifica: titulo de la ventana GLFW.
      * Devuelve: nada.
-     * Momento: al iniciar, sumar puntos, empezar o terminar la partida.
+     * Momento: al iniciar, sumar puntos, cambiar dificultad, empezar o terminar la
+     * partida.
+     *
+     * R2.3 agrega nivel, velocidad e intervalo para que la dificultad actual sea
+     * visible sin modificar el Renderer ni crear un HUD nuevo.
      */
     private void updateWindowTitle() {
         if (window == 0) {
             return;
         }
 
+        String difficultyTitle = String.format(
+                Locale.US,
+                " | Nivel: %d | Vel: %.2f | Spawn: %.2fs",
+                pipeManager.getCurrentLevel(),
+                pipeManager.getCurrentPipeSpeed(),
+                pipeManager.getCurrentSpawnInterval());
+
         String baseTitle = "Flappy Bird OpenGL"
                 + " | azul: " + scorePlayer2 + (player2Alive ? " vivo" : " muerto")
-                + " | rojo: " + scorePlayer1 + (player1Alive ? " vivo" : " muerto");
+                + " | rojo: " + scorePlayer1 + (player1Alive ? " vivo" : " muerto")
+                + difficultyTitle;
 
         if (!started) {
             GLFW.glfwSetWindowTitle(window, baseTitle + " | SPACE J1 / W o UP J2 para empezar");
