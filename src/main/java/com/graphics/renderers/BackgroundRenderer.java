@@ -37,6 +37,8 @@ public class BackgroundRenderer {
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
         renderSkyGradient();
         renderStars();
+        renderMoon();
+        renderLeftCloud();
         renderCloudDetail();
         renderCitySkyline();
     }
@@ -64,8 +66,8 @@ public class BackgroundRenderer {
         }
 
         // R4. Franja rosada del horizonte, inspirada en la referencia nocturna.
-        shapes.drawRect(0.0f, -0.36f, 2.0f, 0.22f, 0.55f, 0.12f, 0.38f);
-        shapes.drawRect(0.0f, -0.45f, 2.0f, 0.18f, 0.24f, 0.10f, 0.30f);
+        shapes.drawRect(0.0f, -0.56f, 2.0f, 0.32f, 0.55f, 0.12f, 0.38f);
+        shapes.drawRect(0.0f, -0.75f, 2.0f, 0.28f, 0.24f, 0.10f, 0.30f);
     }
 
     /**
@@ -105,8 +107,40 @@ public class BackgroundRenderer {
         shapes.drawEllipse(0.50f, 0.56f, 0.0f, 0.0f, 0.13f, 0.020f, 0.0f, 0.28f, 0.30f, 0.55f);
         shapes.drawEllipse(0.62f, 0.58f, 0.0f, 0.0f, 0.11f, 0.025f, 0.0f, 0.35f, 0.36f, 0.62f);
         shapes.drawEllipse(0.76f, 0.55f, 0.0f, 0.0f, 0.14f, 0.018f, 0.0f, 0.25f, 0.28f, 0.50f);
-        shapes.drawRect(0.50f, 0.38f, 0.22f, 0.008f, 0.92f, 0.32f, 0.50f);
-        shapes.drawRect(0.68f, 0.40f, 0.34f, 0.006f, 0.86f, 0.25f, 0.46f);
+        shapes.drawRect(0.50f, 0.525f, 0.22f, 0.008f, 0.18f, 0.22f, 0.44f);
+        shapes.drawRect(0.68f, 0.515f, 0.34f, 0.006f, 0.18f, 0.22f, 0.44f);
+    }
+
+    /**
+     * R4.
+     * Dibuja una luna creciente con tonos suaves, no un circulo blanco plano.
+     *
+     * Recibe: nada.
+     * Modifica: framebuffer con elipses superpuestas para formar la luna.
+     * Devuelve: nada.
+     * Momento: despues de estrellas y antes de nubes/ciudad.
+     */
+    public void renderMoon() {
+        shapes.drawEllipse(-0.70f, 0.66f, 0.0f, 0.0f, 0.080f, 0.080f, 0.0f, 0.90f, 0.86f, 0.68f);
+        shapes.drawEllipse(-0.67f, 0.68f, 0.0f, 0.0f, 0.070f, 0.075f, 0.0f, 0.74f, 0.22f, 0.44f);
+        shapes.drawEllipse(-0.72f, 0.69f, 0.0f, 0.0f, 0.014f, 0.010f, 0.0f, 0.72f, 0.68f, 0.55f);
+        shapes.drawEllipse(-0.75f, 0.62f, 0.0f, 0.0f, 0.011f, 0.008f, 0.0f, 0.74f, 0.70f, 0.58f);
+    }
+
+    /**
+     * R4.
+     * Agrega una nube hacia la izquierda para equilibrar el paisaje nocturno.
+     *
+     * Recibe: nada.
+     * Modifica: framebuffer con elipses y una base rectangular tenue.
+     * Devuelve: nada.
+     * Momento: antes de la ciudad, lejos del HUD y de las tuberias principales.
+     */
+    public void renderLeftCloud() {
+        shapes.drawEllipse(-0.58f, 0.46f, 0.0f, 0.0f, 0.12f, 0.019f, 0.0f, 0.22f, 0.25f, 0.48f);
+        shapes.drawEllipse(-0.47f, 0.48f, 0.0f, 0.0f, 0.10f, 0.024f, 0.0f, 0.30f, 0.32f, 0.58f);
+        shapes.drawEllipse(-0.36f, 0.45f, 0.0f, 0.0f, 0.13f, 0.018f, 0.0f, 0.20f, 0.24f, 0.46f);
+        shapes.drawRect(-0.48f, 0.425f, 0.34f, 0.010f, 0.18f, 0.22f, 0.44f);
     }
 
     /**
@@ -145,12 +179,12 @@ public class BackgroundRenderer {
         }
 
         // R4. Antenas y techos para que la silueta no sea una fila plana.
-        shapes.drawRect(-0.56f, -0.26f, 0.15f, 0.035f, 0.03f, 0.03f, 0.09f);
-        shapes.drawRect(-0.48f, -0.19f, 0.020f, 0.13f, 0.03f, 0.03f, 0.09f);
-        shapes.drawTriangle(0.15f, -0.33f, -0.065f, 0.020f, 0.0f, 0.080f, 0.065f, 0.020f,
+        shapes.drawRect(-0.56f, -0.32f, 0.15f, 0.035f, 0.03f, 0.03f, 0.09f);
+        shapes.drawRect(-0.48f, -0.27f, 0.020f, 0.13f, 0.03f, 0.03f, 0.09f);
+        shapes.drawTriangle(0.15f, -0.39f, -0.065f, 0.020f, 0.0f, 0.080f, 0.065f, 0.020f,
                 0.0f, 0.03f, 0.03f, 0.09f);
-        shapes.drawRect(0.63f, -0.29f, 0.018f, 0.16f, 0.03f, 0.03f, 0.09f);
-        shapes.drawTriangle(0.63f, -0.19f, -0.030f, 0.000f, 0.0f, 0.065f, 0.030f, 0.000f,
+        shapes.drawRect(0.63f, -0.36f, 0.018f, 0.16f, 0.03f, 0.03f, 0.09f);
+        shapes.drawTriangle(0.63f, -0.28f, -0.030f, 0.000f, 0.0f, 0.065f, 0.030f, 0.000f,
                 0.0f, 0.03f, 0.03f, 0.09f);
 
         shapes.drawRect(0.0f, -0.94f, 2.0f, 0.16f, 0.02f, 0.02f, 0.07f);

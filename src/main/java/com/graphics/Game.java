@@ -22,8 +22,8 @@ import org.lwjgl.opengl.GL;
  */
 public class Game {
 
-    private static final int WINDOW_WIDTH = 900;
-    private static final int WINDOW_HEIGHT = 700;
+    private static final int WINDOW_WIDTH = 1200;
+    private static final int WINDOW_HEIGHT = 850;
 
     /*
      * Delta time (dt) es el tiempo transcurrido entre un frame y el siguiente.
@@ -357,7 +357,7 @@ public class Game {
                 + difficultyTitle;
 
         if (!started) {
-            GLFW.glfwSetWindowTitle(window, baseTitle + " | SPACE J1 / W o UP J2 para empezar");
+            GLFW.glfwSetWindowTitle(window, baseTitle + " | Para empezar J1 => SPACE / J2 => W o UP");
         } else if (gameOver) {
             GLFW.glfwSetWindowTitle(window, baseTitle + " | GAME OVER - R para reiniciar");
         } else {
