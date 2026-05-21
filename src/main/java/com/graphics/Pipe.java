@@ -24,6 +24,7 @@ public class Pipe {
     // ----------------------------- R2. --------------------------------
     private boolean scoredPlayer1;
     private boolean scoredPlayer2;
+    private boolean scoredPlayer3;
     // -------------------------------------------------------------
 
     /**
@@ -83,6 +84,10 @@ public class Pipe {
         return !scoredPlayer2 && getRight() < birdX;
     }
 
+    public boolean canScorePlayer3(float birdX) {
+        return !scoredPlayer3 && getRight() < birdX;
+    }
+
     /**
      * 
      * Marca la tuberia como ya puntuada para no sumar varias veces.
@@ -93,6 +98,10 @@ public class Pipe {
 
     public void markScoredPlayer2() {
         scoredPlayer2 = true;
+    }
+
+    public void markScoredPlayer3() {
+        scoredPlayer3 = true;
     }
     // ----------------------------------------------------------------------------
 

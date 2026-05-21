@@ -48,10 +48,13 @@ public class Game {
     // ------------------------------- R2. -------------------------------
     private final Bird player1 = new Bird(-0.45f, 0.00f);
     private final Bird player2 = new Bird(-0.70f, 0.00f);
+    private final Bird player3 = new Bird(-0.20f, 0.00f);
     private int scorePlayer1;
     private int scorePlayer2;
+    private int scorePlayer3;
     private boolean player1Alive;
     private boolean player2Alive;
+    private boolean player3Alive;
     // -------------------------------//-------------------------------
 
     private final PipeManager pipeManager = new PipeManager();
@@ -60,6 +63,10 @@ public class Game {
 
     private boolean started;
     private boolean gameOver;
+    private boolean congrulations;
+
+    private int win = 5;
+    private int winnerPlayer;
 
     /**
      * Metodo principal de ejecucion del juego.
@@ -143,18 +150,24 @@ public class Game {
     private void resetGame() {
         player1.reset();
         player2.reset();
+        player3.reset();
 
         scorePlayer1 = 0;
         scorePlayer2 = 0;
+        scorePlayer3 = 0;
 
         pipeManager.reset();
-        pipeManager.updateDifficulty(scorePlayer1, scorePlayer2); //R3. despues del puntaje para obtener cambios
+        pipeManager.updateDifficulty(scorePlayer1, scorePlayer2, scorePlayer3); // R3. despues del puntaje para obtener
+                                                                                // cambios
 
         player1Alive = true;
         player2Alive = true;
+        player3Alive = true;
 
         started = false;
         gameOver = false;
+        congrulations = false;
+        winnerPlayer = 0;
 
         updateWindowTitle();
     }
@@ -215,7 +228,8 @@ public class Game {
     private void processInput() {
         InputManager.InputState input = inputManager.poll(window);
 
-        if (gameOver && (input.isPlayer1JumpPressed() || input.isPlayer2JumpPressed())) {
+        if (gameOver && (input.isPlayer1JumpPressed() || input.isPlayer2JumpPressed()
+                || input.isPlayer3JumpPressed())) {
             resetGame();
             return;
         }
@@ -232,6 +246,14 @@ public class Game {
             started = true;
             if (player2Alive) {// Validacion si un player esta kill no salte
                 player2.jump();
+            }
+            updateWindowTitle();
+        }
+
+        if (input.isPlayer3JumpPressed()) {
+            started = true;
+            if (player3Alive) {// Validacion si un player esta kill no salte
+                player3.jump();
             }
             updateWindowTitle();
         }
@@ -254,10 +276,6 @@ public class Game {
     private void update(float dt) {
         if (!started || gameOver) {
             return;
-        }
-
-        if (!player1Alive && !player2Alive) {
-            gameOver = true;
         }
 
         pipeManager.updatePipes(dt);
@@ -288,13 +306,47 @@ public class Game {
             player2.dead(dt);
         }
 
+        if (player3Alive) {
+            player3.update(dt);
+
+            if (player3.isOutOfBounds() || pipeManager.collidesWithBird(player3)) {
+                player3.setVelocityY(-0.3f);
+                player3Alive = false;
+            } else {
+                scorePlayer3 += pipeManager.consumeScoreForPlayer3(player3);
+            }
+        } else {
+            player3.dead(dt);
+        }
+
+        if (!player1Alive && !player2Alive && !player3Alive) {
+            gameOver = true;
+        }
+
+        // -----gana cuando consiguen 10 puntos
+        // se le da una muerte como indicacion de que ganaron
+        // Victoria: gana el primer jugador que llegue al puntaje objetivo.
+        if (!congrulations && scorePlayer1 >= win) {
+            congrulations = true;
+            winnerPlayer = 1;
+            gameOver = true;
+        } else if (!congrulations && scorePlayer2 >= win) {
+            congrulations = true;
+            winnerPlayer = 2;
+            gameOver = true;
+        } else if (!congrulations && scorePlayer3 >= win) {
+            congrulations = true;
+            winnerPlayer = 3;
+            gameOver = true;
+        }
+
         /*
          * R2.3.
-         * La dificultad se actualiza despues de sumar los puntos de ambos jugadores.
+         * La dificultad se actualiza despues de sumar los puntos de los jugadores.
          * Asi el nivel nuevo aparece inmediatamente en el titulo y se usa desde el
          * siguiente frame para mover y generar tuberias.
          */
-        pipeManager.updateDifficulty(scorePlayer1, scorePlayer2);
+        pipeManager.updateDifficulty(scorePlayer1, scorePlayer2, scorePlayer3);
 
         updateWindowTitle();
     }
@@ -313,13 +365,18 @@ public class Game {
         renderer.render(
                 player1,
                 player2,
+                player3,
                 pipeManager.getPipes(),
                 player1Alive,
                 player2Alive,
+                player3Alive,
                 started,
                 gameOver,
+                congrulations, // ganador
+                winnerPlayer,
                 scorePlayer1,
                 scorePlayer2,
+                scorePlayer3,
                 pipeManager.getCurrentLevel(),
                 pipeManager.getCurrentPipeSpeed(),
                 pipeManager.getCurrentSpawnInterval());
@@ -354,12 +411,13 @@ public class Game {
         String baseTitle = "Flappy Bird OpenGL"
                 + " | azul: " + scorePlayer2 + (player2Alive ? " vivo" : " muerto")
                 + " | rojo: " + scorePlayer1 + (player1Alive ? " vivo" : " muerto")
+                + " | verde: " + scorePlayer3 + (player3Alive ? " vivo" : " muerto")
                 + difficultyTitle;
 
         if (!started) {
-            GLFW.glfwSetWindowTitle(window, baseTitle + " | Para empezar J1 => SPACE / J2 => W o UP");
+            GLFW.glfwSetWindowTitle(window, baseTitle + " | Para empezar J1 => SPACE / J2 => W o UP / J3 => L");
         } else if (gameOver) {
-            GLFW.glfwSetWindowTitle(window, baseTitle + " | GAME OVER - R para reiniciar");
+            GLFW.glfwSetWindowTitle(window, baseTitle + " | GAME OVER - R o salto para reiniciar");
         } else {
             GLFW.glfwSetWindowTitle(window, baseTitle);
         }

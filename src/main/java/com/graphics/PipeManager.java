@@ -82,7 +82,7 @@ public class PipeManager {
      * --------------------------------------- R3. ---------------------------------------
      * Actualiza la dificultad de la partida segun el puntaje mas alto.
      *
-     * Recibe: puntaje del jugador 1 y puntaje del jugador 2.
+     * Recibe: puntaje de los tres jugadores.
      * Modifica: currentLevel, currentPipeSpeed y currentSpawnInterval.
      * Devuelve: nada.
      * Momento: Game.update() lo llama durante la partida despues de sumar puntos.
@@ -94,8 +94,8 @@ public class PipeManager {
      * para que el juego no se vuelva imposible. La velocidad tambien tiene un
      * maximo y el intervalo tiene un minimo para mantener la partida jugable.
      */
-    public void updateDifficulty(int scorePlayer1, int scorePlayer2) {
-        int highestScore = Math.max(scorePlayer1, scorePlayer2);
+    public void updateDifficulty(int scorePlayer1, int scorePlayer2, int scorePlayer3) {
+        int highestScore = Math.max(scorePlayer1, Math.max(scorePlayer2, scorePlayer3));
         currentLevel = Math.min(MAX_LEVEL, 1 + highestScore / SCORES_PER_LEVEL);
 
         int completedLevelIncrements = currentLevel - 1;
@@ -245,6 +245,21 @@ public class PipeManager {
         for (Pipe pipe : pipes) {
             if (pipe.canScorePlayer2(bird.getX())) {
                 pipe.markScoredPlayer2();
+                scoreDelta++;
+            }
+        }
+
+        return scoreDelta;
+    }
+
+
+    //-------------------tercer jugador-----------------
+    public int consumeScoreForPlayer3(Bird bird) {
+        int scoreDelta = 0;
+
+        for (Pipe pipe : pipes) {
+            if (pipe.canScorePlayer3(bird.getX())) {
+                pipe.markScoredPlayer3();
                 scoreDelta++;
             }
         }

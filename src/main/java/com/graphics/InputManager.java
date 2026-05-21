@@ -23,6 +23,7 @@ public class InputManager {
     // R2.
     private boolean previousW;
     private boolean previousUp;
+    private boolean previousL;
 
     /**
      * Lee el teclado de la ventana actual.
@@ -60,7 +61,12 @@ public class InputManager {
 
         boolean player2JumpPressed = wPressed || upPressed;
 
-        return new InputState(spacePressed, player2JumpPressed, rPressed);
+        //----tercer jugador--------------
+        boolean lNow = GLFW.glfwGetKey(window, GLFW.GLFW_KEY_L) == GLFW.GLFW_PRESS;
+        boolean lPressed = lNow && !previousL;
+        previousL = lNow;
+
+        return new InputState(spacePressed, player2JumpPressed, lPressed, rPressed);
         //--------------------------------------------------------------------------------
     }
 
@@ -74,11 +80,14 @@ public class InputManager {
     public static class InputState {
         private final boolean player1JumpPressed;
         private final boolean player2JumpPressed;
+        private final boolean player3JumpPressed;
         private final boolean rPressed;
 
-        public InputState(boolean player1JumpPressed, boolean player2JumpPressed, boolean rPressed) {
+        public InputState(boolean player1JumpPressed, boolean player2JumpPressed, boolean player3JumpPressed,
+                boolean rPressed) {
             this.player1JumpPressed = player1JumpPressed;
             this.player2JumpPressed = player2JumpPressed;
+            this.player3JumpPressed = player3JumpPressed;
             this.rPressed = rPressed;
         }
 
@@ -88,6 +97,10 @@ public class InputManager {
 
         public boolean isPlayer2JumpPressed() {
             return player2JumpPressed;
+        }
+
+        public boolean isPlayer3JumpPressed() {
+            return player3JumpPressed;
         }
 
         public boolean isRPressed() {

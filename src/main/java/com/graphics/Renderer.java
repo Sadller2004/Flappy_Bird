@@ -69,9 +69,11 @@ public class Renderer {
      * Renderer ya no contiene el dibujo detallado del pajaro, fondo, HUD ni
      * tuberias. Solo decide el orden correcto de las capas.
      */
-    public void render(Bird player1, Bird player2, List<Pipe> pipes, boolean player1Alive, boolean player2Alive,
-            boolean started, boolean gameOver, int scorePlayer1, int scorePlayer2, int currentLevel,
-            float currentPipeSpeed, float currentSpawnInterval) {
+    public void render(Bird player1, Bird player2, Bird player3, List<Pipe> pipes, boolean player1Alive,
+            boolean player2Alive, boolean player3Alive, boolean started, boolean gameOver, boolean congrulations,
+            int winnerPlayer, int scorePlayer1,
+            int scorePlayer2, int scorePlayer3, int currentLevel, float currentPipeSpeed,
+            float currentSpawnInterval) {
         GL20.glUseProgram(program);
 
         backgroundRenderer.renderEnhancedBackground();
@@ -89,7 +91,15 @@ public class Renderer {
             birdRenderer.renderDeadBird(player2);
         }
 
-        hudRenderer.renderHud(scorePlayer1, scorePlayer2, currentLevel, currentPipeSpeed, currentSpawnInterval);
+        // --------------tercer jugador----------------------------
+        if (player3Alive) {
+            birdRenderer.renderBirdPlayer3(player3);
+        } else {
+            birdRenderer.renderDeadBird(player3);
+        }
+
+        hudRenderer.renderHud(scorePlayer1, scorePlayer2, scorePlayer3, currentLevel, currentPipeSpeed,
+                currentSpawnInterval);
 
         if (!started) {
             hudRenderer.renderStartScreen();
@@ -97,6 +107,11 @@ public class Renderer {
 
         if (gameOver) {
             hudRenderer.renderGameOverScreen();
+        }
+
+        // para indicar ganador
+        if (congrulations) {
+            hudRenderer.renderCongrulation(winnerPlayer, scorePlayer1, scorePlayer2, scorePlayer3);
         }
 
         GL30.glBindVertexArray(0);

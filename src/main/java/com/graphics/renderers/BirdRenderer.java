@@ -35,6 +35,14 @@ public class BirdRenderer {
     }
 
     /**
+     * Jugador 3: mismo pajaro geometrico, pero con verde para separarlo de los
+     * jugadores rojo y azul.
+     */
+    public void renderBirdPlayer3(Bird bird) {
+        renderGeometricBird(bird, 0.20f, 0.85f, 0.35f, true);
+    }
+
+    /**
      * Pajaro muerto: conserva la figura compuesta, pero usa colores apagados.
      * Esto evita volver al rectangulo simple y permite ver que ese jugador ya no
      * esta activo mientras el otro puede seguir jugando.
